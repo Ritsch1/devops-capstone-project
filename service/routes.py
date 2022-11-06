@@ -68,7 +68,18 @@ def create_accounts():
 # READ AN ACCOUNT
 ######################################################################
 
-# ... place you code here to READ an account ...
+@app.route("/accounts/<id>", methods=["GET"])
+def read_account(id:int) -> dict:
+    search_result = Account.find(id)
+    was_found = bool(search_result)
+    status_code = status.HTTP_200_OK if was_found else status.HTTP_404_NOT_FOUND 
+    response_body = search_result.serialize() if was_found else {}
+
+    if not was_found:
+        abort(status_code, f"Account with id {id} could not be found :(")
+
+    return response_body, status_code
+    
 
 
 ######################################################################
