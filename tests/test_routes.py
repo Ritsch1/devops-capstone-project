@@ -134,7 +134,31 @@ class TestAccountService(TestCase):
             content_type="application/json"
         )
         assert response_get.status_code == status.HTTP_404_NOT_FOUND
+        
+    def test_list_accounts(self):
+        # Arrange
+        # Create 10 accounts in the database
+        self._create_accounts(count=10)
+        response_get = self.client.get(
+            BASE_URL,
+            content_type="application/json"
+        )
+        assert response_get.status_code == status.HTTP_200_OK
+        json_response_body = response_get.get_json()
+        assert len(json_response_body) == 10
+        assert type(json_response_body) == list
+        assert all(type(d) == dict for d in json_response_body)
 
+    def test_list_accounts_empty(self):
+        # Test correct behaviour in case there are no accounts
+        response_get = self.client.get(
+            BASE_URL,
+            content_type="application/json"
+        )
+        assert response_get.status_code == status.HTTP_200_OK
+        json_response_body = response_get.get_json()
+        assert len(json_response_body) == 0
+        assert type(json_response_body) == list
 
     def test_bad_request(self):
         """It should not Create an Account when sending the wrong data"""
