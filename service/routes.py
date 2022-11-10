@@ -61,15 +61,23 @@ def create_accounts():
 # LIST ALL ACCOUNTS
 ######################################################################
 
-# ... place you code here to LIST accounts ...
-
+@app.route("/accounts", methods=["GET"])
+def list_accounts() -> tuple:
+    """
+    List all accounts that are in the database.
+    """
+    app.logger.info("GET request to /accounts")
+    all_accounts = Account.all()
+    # Serialize into list of dicts
+    all_accounts = [acc.serialize() for acc in all_accounts]
+    return jsonify(all_accounts), status.HTTP_200_OK 
 
 ######################################################################
 # READ AN ACCOUNT
 ######################################################################
 
 @app.route("/accounts/<id>", methods=["GET"])
-def read_account(id:int) -> dict:
+def read_account(id:int) -> tuple:
     search_result = Account.find(id)
     was_found = bool(search_result)
     status_code = status.HTTP_200_OK if was_found else status.HTTP_404_NOT_FOUND 
@@ -78,7 +86,7 @@ def read_account(id:int) -> dict:
     if not was_found:
         abort(status_code, f"Account with id {id} could not be found :(")
 
-    return response_body, status_code
+    return jsonify(response_body), status_code
     
 
 
