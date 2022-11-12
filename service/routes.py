@@ -112,8 +112,13 @@ def update_accounts(id:int) -> tuple:
 # DELETE AN ACCOUNT
 ######################################################################
 
-# ... place you code here to DELETE an account ...
-
+@app.route("/accounts/<id>", methods=["DELETE"])
+def delete_account(id:int) -> tuple:
+    search_result = Account.find(id)
+    was_found = bool(search_result)
+    if was_found:
+        search_result.delete()
+    return "", status.HTTP_204_NO_CONTENT
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
