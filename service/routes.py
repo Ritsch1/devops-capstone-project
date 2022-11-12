@@ -94,8 +94,19 @@ def read_account(id:int) -> tuple:
 # UPDATE AN EXISTING ACCOUNT
 ######################################################################
 
-# ... place you code here to UPDATE an account ...
-
+@app.route("/accounts/<id>", methods=["PUT"])
+def update_accounts(id:int) -> tuple:
+    search_result = Account.find(id)
+    was_found = bool(search_result)
+    status_code = status.HTTP_200_OK if was_found else status.HTTP_404_NOT_FOUND
+    if was_found:
+        # Deserialize json into python dictionary
+        search_result.deserialize(request.get_json())
+        search_result.update()
+        
+        return search_result.serialize(), status_code
+    else:
+        abort(status_code)
 
 ######################################################################
 # DELETE AN ACCOUNT

@@ -125,7 +125,7 @@ class TestAccountService(TestCase):
         assert json_response_get["phone_number"] == account.phone_number
         assert json_response_get["date_joined"] == str(account.date_joined)
 
-    def test_account_not_found(self):
+    def test_read_account_not_found(self):
         # Arrange
         # Account id of zero should apparently never exist
         non_existing_account_id = 0
@@ -159,6 +159,31 @@ class TestAccountService(TestCase):
         json_response_body = response_get.get_json()
         assert len(json_response_body) == 0
         assert type(json_response_body) == list
+
+    def test_update_account(self):
+        # Create an account in the database
+        created_account = self._create_accounts(count=1)[0]
+        # Define changes on account
+        update_account = AccountFactory()
+        update_account.name = "Jeronimo"
+        update_account.phone_number = 42
+        update_account.id = created_account.id 
+        response_put = self.client.put(
+            f"{BASE_URL}/{created_account.id}",
+            json=update_account.serialize()
+        )
+        assert response_put.status_code == status.HTTP_200_OK
+        put_json_response = response_put.get_json()
+        assert put_json_response["name"] == "Jeronimo"
+        assert put_json_response["phone_number"] == "42"
+
+    def test_update_account_not_existing(self):
+        # Send http put request on non - existing id
+        response_put = self.client.put(
+            f"{BASE_URL}/42",
+            json={}
+        )
+        assert response_put.status_code == status.HTTP_404_NOT_FOUND
 
     def test_bad_request(self):
         """It should not Create an Account when sending the wrong data"""
