@@ -209,4 +209,12 @@ class TestAccountService(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
-    # ADD YOUR TEST CASES HERE ...
+    def test_method_not_allowed(self):
+        "If a HTTP method is used on an endpoint that is not valid, return HTTP status error 405"
+        account = AccountFactory()
+        response = self.client.post(
+            f"{BASE_URL}/{account.id}",
+            content_type="application/json",
+            json=account.serialize()
+        )
+        assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
