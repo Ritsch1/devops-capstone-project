@@ -61,6 +61,7 @@ def create_accounts():
 # LIST ALL ACCOUNTS
 ######################################################################
 
+
 @app.route("/accounts", methods=["GET"])
 def list_accounts() -> tuple:
     """
@@ -70,32 +71,32 @@ def list_accounts() -> tuple:
     all_accounts = Account.all()
     # Serialize into list of dicts
     all_accounts = [acc.serialize() for acc in all_accounts]
-    return jsonify(all_accounts), status.HTTP_200_OK 
+    return jsonify(all_accounts), status.HTTP_200_OK
 
 ######################################################################
 # READ AN ACCOUNT
 ######################################################################
 
+
 @app.route("/accounts/<id>", methods=["GET"])
-def read_account(id:int) -> tuple:
+def read_account(id: int) -> tuple:
     search_result = Account.find(id)
     was_found = bool(search_result)
-    status_code = status.HTTP_200_OK if was_found else status.HTTP_404_NOT_FOUND 
+    status_code = status.HTTP_200_OK if was_found else status.HTTP_404_NOT_FOUND
     response_body = search_result.serialize() if was_found else {}
 
     if not was_found:
         abort(status_code, f"Account with id {id} could not be found :(")
 
     return jsonify(response_body), status_code
-    
-
 
 ######################################################################
 # UPDATE AN EXISTING ACCOUNT
 ######################################################################
 
+
 @app.route("/accounts/<id>", methods=["PUT"])
-def update_accounts(id:int) -> tuple:
+def update_accounts(id: int) -> tuple:
     search_result = Account.find(id)
     was_found = bool(search_result)
     status_code = status.HTTP_200_OK if was_found else status.HTTP_404_NOT_FOUND
@@ -103,7 +104,7 @@ def update_accounts(id:int) -> tuple:
         # Deserialize json into python dictionary
         search_result.deserialize(request.get_json())
         search_result.update()
-        
+
         return search_result.serialize(), status_code
     else:
         abort(status_code)
@@ -112,8 +113,9 @@ def update_accounts(id:int) -> tuple:
 # DELETE AN ACCOUNT
 ######################################################################
 
+
 @app.route("/accounts/<id>", methods=["DELETE"])
-def delete_account(id:int) -> tuple:
+def delete_account(id: int) -> tuple:
     search_result = Account.find(id)
     was_found = bool(search_result)
     if was_found:

@@ -22,6 +22,8 @@ BASE_URL = "/accounts"
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
+
+
 class TestAccountService(TestCase):
     """Account Service Tests"""
 
@@ -116,9 +118,9 @@ class TestAccountService(TestCase):
             f"{BASE_URL}/{account.id}",
             content_type="application/json"
         )
-    
+
         assert response_get.status_code == status.HTTP_200_OK
-        json_response_get =  response_get.get_json()
+        json_response_get = response_get.get_json()
         assert json_response_get["name"] == account.name
         assert json_response_get["email"] == account.email
         assert json_response_get["address"] == account.address
@@ -134,7 +136,7 @@ class TestAccountService(TestCase):
             content_type="application/json"
         )
         assert response_get.status_code == status.HTTP_404_NOT_FOUND
-        
+
     def test_list_accounts(self):
         # Arrange
         # Create 10 accounts in the database
@@ -167,7 +169,7 @@ class TestAccountService(TestCase):
         update_account = AccountFactory()
         update_account.name = "Jeronimo"
         update_account.phone_number = 42
-        update_account.id = created_account.id 
+        update_account.id = created_account.id
         response_put = self.client.put(
             f"{BASE_URL}/{created_account.id}",
             json=update_account.serialize()
@@ -192,7 +194,8 @@ class TestAccountService(TestCase):
             f"{BASE_URL}/{created_acc.id}"
         )
         assert response_delete.status_code == status.HTTP_204_NO_CONTENT
-        assert bool(response_delete.get_json()) == False
+        is_response_empty = bool(response_delete.get_json())
+        assert not is_response_empty
 
     def test_bad_request(self):
         """It should not Create an Account when sending the wrong data"""
