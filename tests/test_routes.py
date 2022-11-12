@@ -185,6 +185,15 @@ class TestAccountService(TestCase):
         )
         assert response_put.status_code == status.HTTP_404_NOT_FOUND
 
+    def test_delete_account(self):
+        # Create Account
+        created_acc = self._create_accounts(count=1)[0]
+        response_delete = self.client.delete(
+            f"{BASE_URL}/{created_acc.id}"
+        )
+        assert response_delete.status_code == status.HTTP_204_NO_CONTENT
+        assert bool(response_delete.get_json()) == False
+
     def test_bad_request(self):
         """It should not Create an Account when sending the wrong data"""
         response = self.client.post(BASE_URL, json={"name": "not enough data"})
