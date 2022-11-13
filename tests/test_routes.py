@@ -237,3 +237,8 @@ class TestAccountService(TestCase):
         assert root_response.headers["X-Content-Type-Options"] == "nosniff"
         assert root_response.headers["Content-Security-Policy"] == 'default-src \'self\'; object-src \'none\''
         assert root_response.headers["Referrer-Policy"] == "strict-origin-when-cross-origin"
+
+    def test_presence_of_CORS_policy_headers(self):
+        root_response = self.client.get("/", environ_overrides=HTTPS_ENVIRON)
+        assert root_response.status_code == status.HTTP_200_OK
+        assert root_response.headers["Access-Control-Allow-Origin"] == "*"
