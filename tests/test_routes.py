@@ -12,12 +12,14 @@ from tests.factories import AccountFactory
 from service.common import status  # HTTP Status Codes
 from service.models import db, Account, init_db
 from service.routes import app
+from service import talisman
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/postgres"
 )
 
 BASE_URL = "/accounts"
+HTTPS_ENVIRON = {"wsgi.url_scheme":"https"}
 
 ######################################################################
 #  T E S T   C A S E S
@@ -30,6 +32,8 @@ class TestAccountService(TestCase):
     @classmethod
     def setUpClass(cls):
         """Run once before all tests"""
+        # Do not enforce https for testing
+        talisman.force_https=False
         app.config["TESTING"] = True
         app.config["DEBUG"] = False
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
@@ -221,3 +225,15 @@ class TestAccountService(TestCase):
             json=account.serialize()
         )
         assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
+
+    def test_presence_of_http_security_headers(self):
+        root_response = self.client.get(
+                                "/",
+                                environ_overrides=HTTPS_ENVIRON
+        )
+        assert root_response.status_code == status.HTTP_200_OK
+        assert root_response.headers["X-Frame-Options"] == "SAMEORIGIN"
+        assert root_response.headers["X-XSS-Protection"] == "1; mode=block"
+        assert root_response.headers["X-Content-Type-Options"] == "nosniff"
+        assert root_response.headers["Content-Security-Policy"] == 'default-src \'self\'; object-src \'none\''
+        assert root_response.headers["Referrer-Policy"] == "strict-origin-when-cross-origin"
