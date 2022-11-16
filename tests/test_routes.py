@@ -19,7 +19,7 @@ DATABASE_URI = os.getenv(
 )
 
 BASE_URL = "/accounts"
-HTTPS_ENVIRON = {"wsgi.url_scheme":"https"}
+HTTPS_ENVIRON = {"wsgi.url_scheme": "https"}
 
 ######################################################################
 #  T E S T   C A S E S
@@ -33,7 +33,7 @@ class TestAccountService(TestCase):
     def setUpClass(cls):
         """Run once before all tests"""
         # Do not enforce https for testing
-        talisman.force_https=False
+        talisman.force_https = False
         app.config["TESTING"] = True
         app.config["DEBUG"] = False
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
